@@ -1,0 +1,23 @@
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  <input type="file" name="prescription" required>
+  <button type="submit">Analyze</button>
+</form>
+
+{% if text %}
+  <h3>Extracted Text:</h3>
+  <p>{{ text }}</p>
+{% endif %}
+
+{% if conflicts %}
+  <h3>Conflicts Found:</h3>
+  <ul>
+    {% for c in conflicts %}
+      <li><strong>{{ c.pair.0 }}</strong> + <strong>{{ c.pair.1 }}</strong>: {{ c.warning }}</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  {% if text %}
+    <p>No major conflicts detected 🎉</p>
+  {% endif %}
+{% endif %}

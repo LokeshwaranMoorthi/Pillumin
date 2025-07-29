@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tablet Identifier | Pillumin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            background-color: #f3f4f6;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1e40af;
+        }
+
+        .output {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .output h3 {
+            margin-top: 0;
+            color: #111827;
+        }
+
+        .loading {
+            color: #6b7280;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pillumin - Tablet Identifier</h1>
+    <form>
+        <textarea id="input" placeholder="Enter pill or medicine name..."></textarea>
+        <button type="submit">Check</button>
+    </form>
+
+    <div class="output">
+        <h3>Details:</h3>
+        <pre id="body" class="loading">Awaiting input...</pre>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        const body = document.getElementById('body');
+        const submit_btn = document.querySelector('button');
+        const input = document.getElementById('input');
+
+        submit_btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            body.innerHTML = "<i>Fetching details from Pillumin AI...</i>";
+
+            const response = await fetch("/identifier/tablet-identifier/answer/", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({message: input.value})
+            });
+
+            const reader = response.body.getReader();
+            let output = "";
+
+            while (true) {
+                const {done, value} = await reader.read();
+                output += new TextDecoder().decode(value);
+                body.innerHTML = marked.parse(output);
+
+                if (done) break;
+            }
+        });
+    </script>
+</body>
+</html>
